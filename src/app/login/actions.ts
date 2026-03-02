@@ -24,7 +24,8 @@ export async function signup(formData: FormData) {
   }
   const { error } = await supabase.auth.signUp(data)
   if (error) redirect('/login?error=' + encodeURIComponent(error.message))
-  redirect('/login?message=' + encodeURIComponent('이메일을 확인해 계정을 인증해주세요'))
+  revalidatePath('/', 'layout')
+  redirect('/')
 }
 
 export async function signout() {
