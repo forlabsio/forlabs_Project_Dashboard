@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { cn } from '@/lib/utils'
-import { LayoutDashboard, Package, TrendingUp, BarChart3, LogOut } from 'lucide-react'
+import { LayoutDashboard, Package, TrendingUp, BarChart3, LogOut, User } from 'lucide-react'
 import { signout } from '@/app/login/actions'
 
 const navItems = [
@@ -13,7 +13,7 @@ const navItems = [
   { href: '/analytics', label: '분석', icon: BarChart3 },
 ]
 
-export function Sidebar() {
+export function Sidebar({ userEmail }: { userEmail?: string }) {
   const pathname = usePathname()
 
   return (
@@ -39,7 +39,13 @@ export function Sidebar() {
           </Link>
         ))}
       </nav>
-      <div className="p-4 border-t">
+      <div className="p-4 border-t space-y-1">
+        {userEmail && (
+          <div className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-muted-foreground">
+            <User className="h-4 w-4 shrink-0" />
+            <span className="truncate">{userEmail}</span>
+          </div>
+        )}
         <form action={signout}>
           <button
             type="submit"
