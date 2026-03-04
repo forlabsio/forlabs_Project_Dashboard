@@ -1,6 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
-import { ServiceCard } from '@/components/services/service-card'
 import { AddServiceDialog } from '@/components/services/add-service-dialog'
+import { ServicesFilter } from '@/components/services/services-filter'
 import { Service, RevenueEntry } from '@/types'
 
 type ServiceWithRevenue = Service & { revenue_entries: Pick<RevenueEntry, 'amount'>[] }
@@ -39,15 +39,7 @@ export default async function ServicesPage() {
           <p className="text-sm mt-2">첫 번째 서비스를 추가해보세요!</p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {services.map((service) => (
-            <ServiceCard
-              key={service.id}
-              service={service}
-              totalRevenue={service.revenue_entries.reduce((sum, e) => sum + Number(e.amount), 0)}
-            />
-          ))}
-        </div>
+        <ServicesFilter services={services} />
       )}
     </div>
   )
