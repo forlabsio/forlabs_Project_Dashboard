@@ -2,11 +2,20 @@
 
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { Service } from '@/types'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { ExternalLink, TrendingUp } from 'lucide-react'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
+import { EditServiceDialog } from './edit-service-dialog'
+import { ExternalLink, TrendingUp, MoreVertical, Pencil, Trash2 } from 'lucide-react'
 
 const statusColors: Record<string, string> = {
   active: 'bg-green-100 text-green-800',
@@ -35,19 +44,36 @@ function HealthDot({ status }: { status: HealthStatus }) {
     down: 'bg-red-500',
     unknown: '',
   }
-  return <span className={`inline-block w-2 h-2 rounded-full ${colors[status]}`} title={status === 'up' ? '접속 가능' : status === 'down' ? '접속 불가' : '확인 중'} />
+  const titles: Record<HealthStatus, string> = {
+    checking: '확인 중', up: '접속 가능', down: '접속 불가', unknown: '',
+  }
+  return <span className={`inline-block w-2 h-2 rounded-full flex-shrink-0 ${colors[status]}`} title={titles[status]} />
 }
 
 export function ServiceCard({ service, totalRevenue = 0 }: ServiceCardProps) {
+  const router = useRouter()
   const [health, setHealth] = useState<HealthStatus>(service.url ? 'checking' : 'unknown')
+  const [editOpen, setEditOpen] = useState(false)
 
   useEffect(() => {
     if (!service.url) return
-    fetch(`/api/health-check?url=${encodeURIComponent(service.url)}`)
-      .then((r) => r.json())
-      .then((data) => setHealth(data.status === 'up' ? 'up' : 'down'))
+    // 클라이언트에서 직접 체크 - no-cors로 CORS 우회, 응답이 오면 up
+    fetch(service.url, { mode: 'no-cors', cache: 'no-store' })
+      .then(() => setHealth('up'))
       .catch(() => setHealth('down'))
   }, [service.url])
+
+  async function handleDelete(e: React.MouseEvent) {
+    e.preventDefault()
+    if (!confirm(`"${service.name}"을(를) 삭제하시겠어요?`)) return
+    await fetch(`/api/services/${service.id}`, { method: 'DELETE' })
+    router.refresh()
+  }
+
+  function handleEdit(e: React.MouseEvent) {
+    e.preventDefault()
+    setEditOpen(true)
+  }
 
   function handleOpen(e: React.MouseEvent) {
     e.preventDefault()
@@ -55,57 +81,87 @@ export function ServiceCard({ service, totalRevenue = 0 }: ServiceCardProps) {
   }
 
   return (
-    <Link href={`/services/${service.id}`}>
-      <Card className="hover:shadow-md transition-shadow cursor-pointer">
-        <CardHeader className="pb-3">
-          <div className="flex items-start justify-between">
-            <div className="flex-1">
-              <CardTitle className="text-base">{service.name}</CardTitle>
-              {service.category && (
-                <p className="text-xs text-muted-foreground mt-1">{service.category}</p>
-              )}
+    <>
+      <Link href={`/services/${service.id}`} className="block h-full">
+        <Card className="hover:shadow-md transition-shadow cursor-pointer h-full flex flex-col">
+          <CardHeader className="pb-3">
+            <div className="flex items-start justify-between gap-2">
+              <div className="flex-1 min-w-0">
+                <CardTitle className="text-base truncate">{service.name}</CardTitle>
+                <p className="text-xs text-muted-foreground mt-1 h-4">
+                  {service.category ?? ''}
+                </p>
+              </div>
+              <div className="flex items-center gap-1 flex-shrink-0">
+                <span className={`text-xs px-2 py-1 rounded-full font-medium ${statusColors[service.status]}`}>
+                  {statusLabels[service.status]}
+                </span>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-6 w-6"
+                      onClick={(e) => e.preventDefault()}
+                    >
+                      <MoreVertical className="h-3.5 w-3.5" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    <DropdownMenuItem onClick={handleEdit}>
+                      <Pencil className="h-3.5 w-3.5 mr-2" />
+                      수정
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={handleDelete} className="text-red-600">
+                      <Trash2 className="h-3.5 w-3.5 mr-2" />
+                      삭제
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
             </div>
-            <span className={`text-xs px-2 py-1 rounded-full font-medium ${statusColors[service.status]}`}>
-              {statusLabels[service.status]}
-            </span>
-          </div>
-        </CardHeader>
-        <CardContent>
-          {service.description && (
-            <p className="text-sm text-muted-foreground line-clamp-2 mb-3">{service.description}</p>
-          )}
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-1 text-sm font-medium">
-              <TrendingUp className="h-3.5 w-3.5 text-green-600" />
-              <span>₩{totalRevenue.toLocaleString()}</span>
-            </div>
-            <div className="flex items-center gap-2">
-              {service.is_paid && (
-                <Badge variant="secondary" className="text-xs">유료</Badge>
-              )}
-              {service.url && (
-                <div className="flex items-center gap-1.5">
-                  <HealthDot status={health} />
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    className="h-6 px-2 text-xs"
-                    onClick={handleOpen}
-                  >
-                    <ExternalLink className="h-3 w-3 mr-1" />
-                    열기
-                  </Button>
-                </div>
-              )}
-            </div>
-          </div>
-          {service.launch_date && (
-            <p className="text-xs text-muted-foreground mt-2">
-              런칭: {new Date(service.launch_date).toLocaleDateString('ko-KR')}
+          </CardHeader>
+          <CardContent className="flex flex-col flex-1">
+            <p className="text-sm text-muted-foreground line-clamp-2 mb-3 h-10">
+              {service.description ?? ''}
             </p>
-          )}
-        </CardContent>
-      </Card>
-    </Link>
+            <div className="mt-auto space-y-2">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-1 text-sm font-medium">
+                  <TrendingUp className="h-3.5 w-3.5 text-green-600" />
+                  <span>₩{totalRevenue.toLocaleString()}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  {service.is_paid && (
+                    <Badge variant="secondary" className="text-xs">유료</Badge>
+                  )}
+                  {service.url && (
+                    <div className="flex items-center gap-1.5">
+                      <HealthDot status={health} />
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="h-6 px-2 text-xs"
+                        onClick={handleOpen}
+                      >
+                        <ExternalLink className="h-3 w-3 mr-1" />
+                        열기
+                      </Button>
+                    </div>
+                  )}
+                </div>
+              </div>
+              <p className="text-xs text-muted-foreground h-4">
+                {service.launch_date
+                  ? `런칭: ${new Date(service.launch_date).toLocaleDateString('ko-KR')}`
+                  : ''}
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+      </Link>
+      <EditServiceDialog service={service} open={editOpen} onOpenChange={setEditOpen} />
+    </>
   )
 }
