@@ -18,7 +18,7 @@ export function Sidebar({ userEmail }: { userEmail?: string }) {
   return (
     <aside className="w-64 bg-white border-r min-h-screen flex flex-col">
       <div className="p-6 border-b">
-        <h1 className="font-bold text-lg">Portfolio Manager</h1>
+        <h1 className="font-bold text-lg">Business Console</h1>
         <p className="text-xs text-muted-foreground mt-1">내 서비스 관리 허브</p>
       </div>
       <nav className="flex-1 p-4 space-y-1">
