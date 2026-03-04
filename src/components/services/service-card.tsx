@@ -21,12 +21,14 @@ const statusColors: Record<string, string> = {
   active: 'bg-green-100 text-green-800',
   paused: 'bg-yellow-100 text-yellow-800',
   killed: 'bg-red-100 text-red-800',
+  test: 'bg-blue-100 text-blue-800',
 }
 
 const statusLabels: Record<string, string> = {
   active: '운영 중',
   paused: '일시정지',
   killed: '종료',
+  test: '테스트',
 }
 
 interface ServiceCardProps {

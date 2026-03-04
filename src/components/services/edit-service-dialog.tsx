@@ -77,6 +77,7 @@ export function EditServiceDialog({ service, open, onOpenChange }: EditServiceDi
                 <SelectContent>
                   <SelectItem value="active">운영 중</SelectItem>
                   <SelectItem value="paused">일시정지</SelectItem>
+                  <SelectItem value="test">테스트</SelectItem>
                   <SelectItem value="killed">종료</SelectItem>
                 </SelectContent>
               </Select>

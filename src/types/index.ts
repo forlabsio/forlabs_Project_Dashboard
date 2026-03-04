@@ -1,4 +1,4 @@
-export type ServiceStatus = 'active' | 'paused' | 'killed'
+export type ServiceStatus = 'active' | 'paused' | 'killed' | 'test'
 export type RevenueType = 'subscription' | 'one-time' | 'ads' | 'other'
 
 export interface Service {

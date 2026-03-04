@@ -8,11 +8,12 @@ import { Button } from '@/components/ui/button'
 import { ArrowLeft, ExternalLink } from 'lucide-react'
 import { RevenueEntry, Service } from '@/types'
 
-const statusLabels: Record<string, string> = { active: '운영 중', paused: '일시정지', killed: '종료' }
+const statusLabels: Record<string, string> = { active: '운영 중', paused: '일시정지', killed: '종료', test: '테스트' }
 const statusColors: Record<string, string> = {
   active: 'bg-green-100 text-green-800',
   paused: 'bg-yellow-100 text-yellow-800',
   killed: 'bg-red-100 text-red-800',
+  test: 'bg-blue-100 text-blue-800',
 }
 const revenueTypeLabels: Record<string, string> = {
   'one-time': '일회성', subscription: '구독', ads: '광고', other: '기타'
