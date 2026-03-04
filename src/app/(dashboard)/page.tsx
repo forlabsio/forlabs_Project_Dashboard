@@ -24,6 +24,7 @@ export default async function DashboardPage() {
 
   const totalRevenue = revenues.reduce((sum, e) => sum + Number(e.amount), 0)
   const activeServices = services.filter(s => s.status === 'active').length
+  const testServices = services.filter(s => s.status === 'test').length
   const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
   const monthlyRevenue = revenues
     .filter(e => e.entry_date >= thirtyDaysAgo)
@@ -43,7 +44,7 @@ export default async function DashboardPage() {
         <StatsCard
           title="전체 서비스"
           value={`${services.length}개`}
-          subtitle={`운영 중 ${activeServices}개`}
+          subtitle={`운영 중 ${activeServices}개 · 테스트 ${testServices}개`}
           icon={Package}
         />
         <StatsCard

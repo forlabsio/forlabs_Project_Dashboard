@@ -25,6 +25,7 @@ export default async function AnalyticsPage() {
   const statusCounts = {
     active: services.filter(s => s.status === 'active').length,
     paused: services.filter(s => s.status === 'paused').length,
+    test: services.filter(s => s.status === 'test').length,
     killed: services.filter(s => s.status === 'killed').length,
   }
 
@@ -46,7 +47,7 @@ export default async function AnalyticsPage() {
         <p className="text-muted-foreground mt-1">서비스 포트폴리오 인사이트</p>
       </div>
 
-      <div className="grid grid-cols-4 gap-4 mb-6">
+      <div className="grid grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
         <Card>
           <CardContent className="pt-6">
             <p className="text-2xl font-bold text-green-600">{statusCounts.active}</p>
@@ -57,6 +58,12 @@ export default async function AnalyticsPage() {
           <CardContent className="pt-6">
             <p className="text-2xl font-bold text-yellow-600">{statusCounts.paused}</p>
             <p className="text-sm text-muted-foreground">일시정지</p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="pt-6">
+            <p className="text-2xl font-bold text-blue-600">{statusCounts.test}</p>
+            <p className="text-sm text-muted-foreground">테스트</p>
           </CardContent>
         </Card>
         <Card>

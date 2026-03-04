@@ -18,6 +18,7 @@ export default async function ServicesPage() {
   const services = await getServicesWithRevenue()
 
   const activeCount = services.filter(s => s.status === 'active').length
+  const testCount = services.filter(s => s.status === 'test').length
   const paidCount = services.filter(s => s.is_paid).length
 
   return (
@@ -26,7 +27,7 @@ export default async function ServicesPage() {
         <div>
           <h1 className="text-2xl font-bold">서비스 목록</h1>
           <p className="text-muted-foreground mt-1">
-            전체 {services.length}개 · 운영 중 {activeCount}개 · 유료 {paidCount}개
+            전체 {services.length}개 · 운영 중 {activeCount}개 · 테스트 {testCount}개 · 유료 {paidCount}개
           </p>
         </div>
         <AddServiceDialog />
