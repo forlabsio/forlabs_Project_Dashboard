@@ -14,6 +14,7 @@ export function AddServiceDialog() {
   const router = useRouter()
   const [open, setOpen] = useState(false)
   const [loading, setLoading] = useState(false)
+  const [noLaunchDate, setNoLaunchDate] = useState(false)
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
@@ -88,8 +89,25 @@ export function AddServiceDialog() {
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="launch_date">런칭일</Label>
-              <Input id="launch_date" name="launch_date" type="date" />
+              <div className="flex items-center justify-between">
+                <Label htmlFor="launch_date">런칭일</Label>
+                <label className="flex items-center gap-1.5 text-xs text-muted-foreground cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={noLaunchDate}
+                    onChange={(e) => setNoLaunchDate(e.target.checked)}
+                    className="w-3.5 h-3.5"
+                  />
+                  미정
+                </label>
+              </div>
+              <Input
+                id="launch_date"
+                name="launch_date"
+                type="date"
+                disabled={noLaunchDate}
+                className={noLaunchDate ? 'opacity-40' : ''}
+              />
             </div>
             <div className="space-y-2">
               <Label htmlFor="is_paid">유료 여부</Label>

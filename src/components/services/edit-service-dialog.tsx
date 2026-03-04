@@ -19,6 +19,7 @@ interface EditServiceDialogProps {
 export function EditServiceDialog({ service, open, onOpenChange }: EditServiceDialogProps) {
   const router = useRouter()
   const [loading, setLoading] = useState(false)
+  const [noLaunchDate, setNoLaunchDate] = useState(!service.launch_date)
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
@@ -87,8 +88,26 @@ export function EditServiceDialog({ service, open, onOpenChange }: EditServiceDi
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="edit-launch_date">런칭일</Label>
-              <Input id="edit-launch_date" name="launch_date" type="date" defaultValue={service.launch_date ?? ''} />
+              <div className="flex items-center justify-between">
+                <Label htmlFor="edit-launch_date">런칭일</Label>
+                <label className="flex items-center gap-1.5 text-xs text-muted-foreground cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={noLaunchDate}
+                    onChange={(e) => setNoLaunchDate(e.target.checked)}
+                    className="w-3.5 h-3.5"
+                  />
+                  미정
+                </label>
+              </div>
+              <Input
+                id="edit-launch_date"
+                name="launch_date"
+                type="date"
+                defaultValue={service.launch_date ?? ''}
+                disabled={noLaunchDate}
+                className={noLaunchDate ? 'opacity-40' : ''}
+              />
             </div>
             <div className="space-y-2">
               <Label htmlFor="edit-is_paid">유료 여부</Label>
