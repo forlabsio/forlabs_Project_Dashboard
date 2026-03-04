@@ -155,7 +155,7 @@ export function ServiceCard({ service, totalRevenue = 0 }: ServiceCardProps) {
               <p className="text-xs text-muted-foreground h-4">
                 {service.launch_date
                   ? `런칭: ${new Date(service.launch_date).toLocaleDateString('ko-KR')}`
-                  : ''}
+                  : '런칭일 미정'}
               </p>
             </div>
           </CardContent>
