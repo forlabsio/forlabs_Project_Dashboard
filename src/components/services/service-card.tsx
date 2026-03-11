@@ -4,24 +4,15 @@ import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Service } from '@/types'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
+import { DropdownMenu as DropdownMenuPrimitive } from 'radix-ui'
 import { EditServiceDialog } from './edit-service-dialog'
 import { ExternalLink, TrendingUp, MoreVertical, Pencil, Trash2 } from 'lucide-react'
 
 const statusColors: Record<string, string> = {
-  active: 'bg-green-100 text-green-800',
-  paused: 'bg-yellow-100 text-yellow-800',
-  killed: 'bg-red-100 text-red-800',
-  test: 'bg-blue-100 text-blue-800',
+  active: 'bg-green-500/15 text-green-700 dark:text-green-400',
+  paused: 'bg-gray-500/15 text-gray-600 dark:text-gray-400',
+  killed: 'bg-red-500/15 text-red-700 dark:text-red-400',
+  test: 'bg-blue-500/15 text-blue-700 dark:text-blue-400',
 }
 
 const statusLabels: Record<string, string> = {
@@ -41,7 +32,7 @@ type HealthStatus = 'checking' | 'up' | 'down' | 'unknown'
 function HealthDot({ status }: { status: HealthStatus }) {
   if (status === 'unknown') return null
   const colors: Record<HealthStatus, string> = {
-    checking: 'bg-gray-300 animate-pulse',
+    checking: 'bg-gray-400 animate-pulse',
     up: 'bg-green-500',
     down: 'bg-red-500',
     unknown: '',
@@ -59,20 +50,19 @@ export function ServiceCard({ service, totalRevenue = 0 }: ServiceCardProps) {
 
   useEffect(() => {
     if (!service.url) return
-    // 클라이언트에서 직접 체크 - no-cors로 CORS 우회, 응답이 오면 up
     fetch(service.url, { mode: 'no-cors', cache: 'no-store' })
       .then(() => setHealth('up'))
       .catch(() => setHealth('down'))
   }, [service.url])
 
-  async function handleDelete(e: React.MouseEvent) {
+  async function handleDelete(e: Event) {
     e.preventDefault()
     if (!confirm(`"${service.name}"을(를) 삭제하시겠어요?`)) return
     await fetch(`/api/services/${service.id}`, { method: 'DELETE' })
     router.refresh()
   }
 
-  function handleEdit(e: React.MouseEvent) {
+  function handleEdit(e: Event) {
     e.preventDefault()
     setEditOpen(true)
   }
@@ -85,83 +75,90 @@ export function ServiceCard({ service, totalRevenue = 0 }: ServiceCardProps) {
   return (
     <>
       <Link href={`/services/${service.id}`} className="block h-full">
-        <Card className="hover:shadow-md transition-shadow cursor-pointer h-full flex flex-col">
-          <CardHeader className="pb-3">
-            <div className="flex items-start justify-between gap-2">
-              <div className="flex-1 min-w-0">
-                <CardTitle className="text-base truncate">{service.name}</CardTitle>
-                <p className="text-xs text-muted-foreground mt-1 h-4">
-                  {service.category ?? ''}
-                </p>
-              </div>
-              <div className="flex items-center gap-1 flex-shrink-0">
-                <span className={`text-xs px-2 py-1 rounded-full font-medium ${statusColors[service.status]}`}>
-                  {statusLabels[service.status]}
-                </span>
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-6 w-6"
-                      onClick={(e) => e.preventDefault()}
+        <div className="plane-card p-4 cursor-pointer h-full flex flex-col">
+          {/* Header */}
+          <div className="flex items-start justify-between gap-2 mb-2">
+            <div className="flex-1 min-w-0">
+              <p className="text-[14px] font-semibold text-[var(--text-primary)] truncate">{service.name}</p>
+              <p className="text-[11px] text-[var(--text-muted)] mt-0.5 h-4 truncate">{service.category ?? ''}</p>
+            </div>
+            <div className="flex items-center gap-1 flex-shrink-0">
+              <span className={`plane-badge ${statusColors[service.status] ?? ''}`}>
+                {statusLabels[service.status]}
+              </span>
+              <DropdownMenuPrimitive.Root>
+                <DropdownMenuPrimitive.Trigger asChild>
+                  <button
+                    className="w-6 h-6 flex items-center justify-center rounded-md plane-btn-ghost"
+                    onClick={(e) => e.preventDefault()}
+                  >
+                    <MoreVertical className="w-3.5 h-3.5" />
+                  </button>
+                </DropdownMenuPrimitive.Trigger>
+                <DropdownMenuPrimitive.Portal>
+                  <DropdownMenuPrimitive.Content
+                    className="plane-card z-50 p-1 min-w-[120px] shadow-lg"
+                    align="end"
+                    sideOffset={4}
+                  >
+                    <DropdownMenuPrimitive.Item
+                      className="flex items-center gap-2 px-2.5 py-1.5 text-[13px] text-[var(--text-secondary)] hover:bg-[var(--surface-3)] hover:text-[var(--text-primary)] rounded-md cursor-pointer outline-none"
+                      onSelect={handleEdit}
                     >
-                      <MoreVertical className="h-3.5 w-3.5" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
-                    <DropdownMenuItem onClick={handleEdit}>
-                      <Pencil className="h-3.5 w-3.5 mr-2" />
+                      <Pencil className="w-3.5 h-3.5" />
                       수정
-                    </DropdownMenuItem>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={handleDelete} className="text-red-600">
-                      <Trash2 className="h-3.5 w-3.5 mr-2" />
+                    </DropdownMenuPrimitive.Item>
+                    <DropdownMenuPrimitive.Separator className="my-1 h-px bg-[var(--border-subtle)]" />
+                    <DropdownMenuPrimitive.Item
+                      className="flex items-center gap-2 px-2.5 py-1.5 text-[13px] text-red-600 hover:bg-red-500/10 rounded-md cursor-pointer outline-none"
+                      onSelect={handleDelete}
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
                       삭제
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
+                    </DropdownMenuPrimitive.Item>
+                  </DropdownMenuPrimitive.Content>
+                </DropdownMenuPrimitive.Portal>
+              </DropdownMenuPrimitive.Root>
+            </div>
+          </div>
+
+          {/* Description */}
+          <p className="text-[12px] text-[var(--text-muted)] line-clamp-2 mb-3 flex-1">
+            {service.description ?? ''}
+          </p>
+
+          {/* Footer */}
+          <div className="mt-auto space-y-2">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-1 text-[13px] font-medium text-[var(--text-primary)]">
+                <TrendingUp className="h-3.5 w-3.5 text-[var(--accent)]" />
+                <span>₩{totalRevenue.toLocaleString()}</span>
+              </div>
+              <div className="flex items-center gap-2">
+                {service.is_paid && (
+                  <span className="plane-badge bg-[var(--accent)]/10 text-[var(--accent)]">유료</span>
+                )}
+                {service.url && (
+                  <div className="flex items-center gap-1.5">
+                    <HealthDot status={health} />
+                    <button
+                      className="plane-btn-outline h-6 px-2 text-[11px] flex items-center gap-1"
+                      onClick={handleOpen}
+                    >
+                      <ExternalLink className="h-3 w-3" />
+                      열기
+                    </button>
+                  </div>
+                )}
               </div>
             </div>
-          </CardHeader>
-          <CardContent className="flex flex-col flex-1">
-            <p className="text-sm text-muted-foreground line-clamp-2 mb-3 h-10">
-              {service.description ?? ''}
+            <p className="text-[11px] text-[var(--text-muted)]">
+              {service.launch_date
+                ? `런칭: ${new Date(service.launch_date).toLocaleDateString('ko-KR')}`
+                : '런칭일 미정'}
             </p>
-            <div className="mt-auto space-y-2">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-1 text-sm font-medium">
-                  <TrendingUp className="h-3.5 w-3.5 text-green-600" />
-                  <span>₩{totalRevenue.toLocaleString()}</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  {service.is_paid && (
-                    <Badge variant="secondary" className="text-xs">유료</Badge>
-                  )}
-                  {service.url && (
-                    <div className="flex items-center gap-1.5">
-                      <HealthDot status={health} />
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        className="h-6 px-2 text-xs"
-                        onClick={handleOpen}
-                      >
-                        <ExternalLink className="h-3 w-3 mr-1" />
-                        열기
-                      </Button>
-                    </div>
-                  )}
-                </div>
-              </div>
-              <p className="text-xs text-muted-foreground h-4">
-                {service.launch_date
-                  ? `런칭: ${new Date(service.launch_date).toLocaleDateString('ko-KR')}`
-                  : '런칭일 미정'}
-              </p>
-            </div>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       </Link>
       <EditServiceDialog service={service} open={editOpen} onOpenChange={setEditOpen} />
     </>

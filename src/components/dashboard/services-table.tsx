@@ -1,14 +1,13 @@
 import Link from 'next/link'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Service, RevenueEntry } from '@/types'
 
 type ServiceWithRevenue = Service & { revenue_entries: Pick<RevenueEntry, 'amount'>[] }
 
 const statusColors: Record<string, string> = {
-  active: 'bg-green-100 text-green-800',
-  paused: 'bg-yellow-100 text-yellow-800',
-  killed: 'bg-red-100 text-red-800',
-  test: 'bg-blue-100 text-blue-800',
+  active: 'bg-green-500/15 text-green-700 dark:text-green-400',
+  paused: 'bg-gray-500/15 text-gray-600 dark:text-gray-400',
+  killed: 'bg-red-500/15 text-red-700 dark:text-red-400',
+  test: 'bg-blue-500/15 text-blue-700 dark:text-blue-400',
 }
 const statusLabels: Record<string, string> = { active: '운영 중', paused: '일시정지', killed: '종료', test: '테스트' }
 
@@ -22,36 +21,32 @@ export function ServicesTable({ services }: { services: ServiceWithRevenue[] }) 
     .slice(0, 5)
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="text-base">매출 Top 5 서비스</CardTitle>
-      </CardHeader>
-      <CardContent>
-        {sorted.length === 0 ? (
-          <p className="text-center text-muted-foreground py-4">데이터 없음</p>
-        ) : (
-          <div className="space-y-2">
-            {sorted.map((service, idx) => (
-              <Link
-                key={service.id}
-                href={`/services/${service.id}`}
-                className="flex items-center justify-between py-2 hover:bg-gray-50 rounded px-2 -mx-2 transition-colors"
-              >
-                <div className="flex items-center gap-3">
-                  <span className="text-sm font-bold text-muted-foreground w-4">{idx + 1}</span>
-                  <div>
-                    <p className="text-sm font-medium">{service.name}</p>
-                    <span className={`text-xs px-1.5 py-0.5 rounded-full ${statusColors[service.status] ?? ''}`}>
-                      {statusLabels[service.status] ?? service.status}
-                    </span>
-                  </div>
+    <div className="plane-card p-4 h-full">
+      <p className="text-[13px] font-semibold text-[var(--text-primary)] mb-3">매출 Top 5 서비스</p>
+      {sorted.length === 0 ? (
+        <p className="text-center text-[var(--text-muted)] py-4 text-[13px]">데이터 없음</p>
+      ) : (
+        <div className="space-y-1">
+          {sorted.map((service, idx) => (
+            <Link
+              key={service.id}
+              href={`/services/${service.id}`}
+              className="flex items-center justify-between py-2 hover:bg-[var(--surface-3)] rounded-md px-2 -mx-2 transition-colors"
+            >
+              <div className="flex items-center gap-3">
+                <span className="text-[12px] font-bold text-[var(--text-muted)] w-4">{idx + 1}</span>
+                <div>
+                  <p className="text-[13px] font-medium text-[var(--text-primary)]">{service.name}</p>
+                  <span className={`text-[10px] px-1.5 py-0.5 rounded-full plane-badge ${statusColors[service.status] ?? ''}`}>
+                    {statusLabels[service.status] ?? service.status}
+                  </span>
                 </div>
-                <p className="text-sm font-semibold">₩{service.total.toLocaleString()}</p>
-              </Link>
-            ))}
-          </div>
-        )}
-      </CardContent>
-    </Card>
+              </div>
+              <p className="text-[13px] font-semibold text-[var(--text-primary)]">₩{service.total.toLocaleString()}</p>
+            </Link>
+          ))}
+        </div>
+      )}
+    </div>
   )
 }

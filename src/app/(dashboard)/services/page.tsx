@@ -21,14 +21,14 @@ export default async function ServicesPage() {
     <div>
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-2xl font-bold">서비스 목록</h1>
+          <h1 className="text-[20px] font-bold text-[var(--text-primary)]">서비스 목록</h1>
         </div>
         <AddServiceDialog />
       </div>
 
       {services.length === 0 ? (
-        <div className="text-center py-16 text-muted-foreground">
-          <p className="text-lg">아직 등록된 서비스가 없습니다</p>
+        <div className="text-center py-16 text-[var(--text-muted)]">
+          <p className="text-[14px] text-[var(--text-muted)]">아직 등록된 서비스가 없습니다</p>
           <p className="text-sm mt-2">첫 번째 서비스를 추가해보세요!</p>
         </div>
       ) : (

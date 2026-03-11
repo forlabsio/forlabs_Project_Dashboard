@@ -21,19 +21,19 @@ export function ServicesFilter({ services }: { services: ServiceWithRevenue[] })
 
   return (
     <div>
-      <div className="flex gap-2 mb-6 flex-wrap">
+      <div className="flex gap-1.5 mb-5 flex-wrap">
         {filters.map(f => (
           <button
             key={f.value}
             onClick={() => setActive(f.value)}
-            className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${
+            className={`px-3 py-1.5 rounded-md text-[12px] font-medium transition-colors ${
               active === f.value
-                ? 'bg-primary text-primary-foreground'
-                : 'bg-muted text-muted-foreground hover:bg-muted/80'
+                ? 'bg-[var(--accent)]/10 text-[var(--accent)]'
+                : 'plane-btn-ghost'
             }`}
           >
             {f.label}
-            <span className="ml-1.5 text-xs opacity-70">
+            <span className="ml-1.5 text-[10px] opacity-60">
               {f.value === 'all' ? services.length : services.filter(s => s.status === f.value).length}
             </span>
           </button>
@@ -41,8 +41,8 @@ export function ServicesFilter({ services }: { services: ServiceWithRevenue[] })
       </div>
 
       {filtered.length === 0 ? (
-        <div className="text-center py-16 text-muted-foreground">
-          <p className="text-lg">해당 상태의 서비스가 없습니다</p>
+        <div className="text-center py-16 text-[var(--text-muted)]">
+          <p className="text-[14px]">해당 상태의 서비스가 없습니다</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">

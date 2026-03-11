@@ -1,7 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import { ServiceRevenueChart } from '@/components/analytics/service-revenue-chart'
 import { RevenueChart } from '@/components/dashboard/revenue-chart'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Service, RevenueEntry } from '@/types'
 
 type ServiceWithRevenue = Service & { revenue_entries: RevenueEntry[] }
@@ -42,79 +41,60 @@ export default async function AnalyticsPage() {
 
   return (
     <div>
-      <div className="mb-8">
-        <h1 className="text-2xl font-bold">분석</h1>
-        <p className="text-muted-foreground mt-1">서비스 포트폴리오 인사이트</p>
+      <div className="mb-6">
+        <h1 className="text-[20px] font-bold text-[var(--text-primary)]">분석</h1>
+        <p className="text-[12px] text-[var(--text-muted)] mt-1">서비스 포트폴리오 인사이트</p>
       </div>
 
-      <div className="grid grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
-        <Card>
-          <CardContent className="pt-6">
-            <p className="text-2xl font-bold text-green-600">{statusCounts.active}</p>
-            <p className="text-sm text-muted-foreground">운영 중</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="pt-6">
-            <p className="text-2xl font-bold text-yellow-600">{statusCounts.paused}</p>
-            <p className="text-sm text-muted-foreground">일시정지</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="pt-6">
-            <p className="text-2xl font-bold text-blue-600">{statusCounts.test}</p>
-            <p className="text-sm text-muted-foreground">테스트</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="pt-6">
-            <p className="text-2xl font-bold text-red-600">{statusCounts.killed}</p>
-            <p className="text-sm text-muted-foreground">종료</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="pt-6">
-            <p className="text-2xl font-bold">{launchPace}개/주</p>
-            <p className="text-sm text-muted-foreground">런칭 페이스</p>
-          </CardContent>
-        </Card>
+      <div className="grid grid-cols-2 lg:grid-cols-5 gap-4 mb-5">
+        {[
+          { count: statusCounts.active, label: '운영 중', color: 'text-[var(--accent)]' },
+          { count: statusCounts.paused, label: '일시정지', color: 'text-[var(--text-muted)]' },
+          { count: statusCounts.test, label: '테스트', color: 'text-blue-500' },
+          { count: statusCounts.killed, label: '종료', color: 'text-red-500' },
+        ].map(({ count, label, color }) => (
+          <div key={label} className="plane-card p-4">
+            <p className={`text-[22px] font-bold ${color}`}>{count}</p>
+            <p className="text-[12px] text-[var(--text-muted)] mt-0.5">{label}</p>
+          </div>
+        ))}
+        <div className="plane-card p-4">
+          <p className="text-[22px] font-bold text-[var(--text-primary)]">{launchPace}개/주</p>
+          <p className="text-[12px] text-[var(--text-muted)] mt-0.5">런칭 페이스</p>
+        </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-6">
+      <div className="grid grid-cols-2 gap-5 mb-5">
         <RevenueChart entries={revenues} />
         <ServiceRevenueChart data={serviceRevenue} />
       </div>
 
-      <Card className="mt-6">
-        <CardHeader>
-          <CardTitle className="text-base">서비스별 매출 상세</CardTitle>
-        </CardHeader>
-        <CardContent>
-          {serviceRevenue.length === 0 ? (
-            <p className="text-center text-muted-foreground py-4">데이터 없음</p>
-          ) : (
-            <div className="space-y-2">
-              {serviceRevenue
-                .sort((a, b) => b.value - a.value)
-                .map((item, idx) => {
-                  const percentage = Math.round((item.value / maxRevenue) * 100)
-                  return (
-                    <div key={idx} className="flex items-center gap-3">
-                      <p className="text-sm w-40 truncate">{item.name}</p>
-                      <div className="flex-1 bg-gray-100 rounded-full h-2">
-                        <div
-                          className="bg-primary h-2 rounded-full transition-all"
-                          style={{ width: `${percentage}%` }}
-                        />
-                      </div>
-                      <p className="text-sm font-medium w-28 text-right">₩{item.value.toLocaleString()}</p>
+      <div className="plane-card p-4">
+        <p className="text-[13px] font-semibold text-[var(--text-primary)] mb-3">서비스별 매출 상세</p>
+        {serviceRevenue.length === 0 ? (
+          <p className="text-center text-[var(--text-muted)] py-4 text-[13px]">데이터 없음</p>
+        ) : (
+          <div className="space-y-2">
+            {serviceRevenue
+              .sort((a, b) => b.value - a.value)
+              .map((item, idx) => {
+                const percentage = Math.round((item.value / maxRevenue) * 100)
+                return (
+                  <div key={idx} className="flex items-center gap-3">
+                    <p className="text-[13px] text-[var(--text-primary)] w-40 truncate">{item.name}</p>
+                    <div className="flex-1 bg-[var(--surface-3)] rounded-full h-2">
+                      <div
+                        className="bg-[var(--accent)] h-2 rounded-full transition-all"
+                        style={{ width: `${percentage}%` }}
+                      />
                     </div>
-                  )
-                })}
-            </div>
-          )}
-        </CardContent>
-      </Card>
+                    <p className="text-[13px] font-medium text-[var(--text-primary)] w-28 text-right">₩{item.value.toLocaleString()}</p>
+                  </div>
+                )
+              })}
+          </div>
+        )}
+      </div>
     </div>
   )
 }
