@@ -2,7 +2,8 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { LayoutDashboard, Package, TrendingUp, BarChart3, LogOut, PanelLeftClose } from 'lucide-react'
+import { useTheme } from 'next-themes'
+import { LayoutDashboard, Package, TrendingUp, BarChart3, LogOut, PanelLeftClose, Sun, Moon } from 'lucide-react'
 import { signout } from '@/app/login/actions'
 
 interface SidebarProps {
@@ -43,6 +44,10 @@ export function Sidebar({ userEmail }: SidebarProps) {
     setExpanded(next)
     localStorage.setItem('sidebar-expanded', String(next))
   }
+
+  const { resolvedTheme, setTheme } = useTheme()
+  const [mounted, setMounted] = useState(false)
+  useEffect(() => setMounted(true), [])
 
   const displayName = userEmail?.split('@')[0] ?? 'User'
   const initial = displayName[0].toUpperCase()
@@ -101,7 +106,20 @@ export function Sidebar({ userEmail }: SidebarProps) {
       </div>
 
       {/* Bottom actions */}
-      <div className="px-1.5 py-1.5 border-t border-[var(--border-subtle)] shrink-0">
+      <div className="px-1.5 py-1.5 border-t border-[var(--border-subtle)] shrink-0 space-y-0.5">
+        {mounted && (
+          <button
+            onClick={() => setTheme(resolvedTheme === 'dark' ? 'light' : 'dark')}
+            className={ghostCls}
+            title={resolvedTheme === 'dark' ? '라이트 모드' : '다크 모드'}
+          >
+            {resolvedTheme === 'dark'
+              ? <Sun className="w-4 h-4 shrink-0" />
+              : <Moon className="w-4 h-4 shrink-0" />
+            }
+            <span className={txt}>{resolvedTheme === 'dark' ? '라이트 모드' : '다크 모드'}</span>
+          </button>
+        )}
         <form action={signout}>
           <button type="submit" className={ghostCls}>
             <LogOut className="w-4 h-4 shrink-0" />
