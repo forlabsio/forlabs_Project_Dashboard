@@ -6,14 +6,23 @@ import { useRouter } from 'next/navigation'
 export function RevenueForm({ serviceId }: { serviceId: string }) {
   const router = useRouter()
   const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
+    const form = e.currentTarget
     setLoading(true)
-    const formData = new FormData(e.currentTarget)
+    setError(null)
+    const formData = new FormData(form)
+    const amount = Number(formData.get('amount'))
+    if (isNaN(amount) || amount <= 0) {
+      setError('올바른 금액을 입력해주세요.')
+      setLoading(false)
+      return
+    }
     const body = {
       service_id: serviceId,
-      amount: Number(formData.get('amount')),
+      amount,
       currency: 'KRW',
       entry_date: formData.get('entry_date'),
       note: formData.get('note') || null,
@@ -28,8 +37,11 @@ export function RevenueForm({ serviceId }: { serviceId: string }) {
 
     setLoading(false)
     if (res.ok) {
-      (e.target as HTMLFormElement).reset()
+      form.reset()
       router.refresh()
+    } else {
+      const json = await res.json().catch(() => ({}))
+      setError(json.error ?? '매출 추가에 실패했습니다.')
     }
   }
 
@@ -40,7 +52,7 @@ export function RevenueForm({ serviceId }: { serviceId: string }) {
         <div className="grid grid-cols-2 gap-2">
           <div>
             <label className="block text-[12px] text-[var(--text-secondary)] mb-1">금액 (KRW)</label>
-            <input name="amount" type="number" min="0" step="100" required placeholder="50000"
+            <input name="amount" type="number" min="1" step="100" required placeholder="50000"
               className="plane-input w-full px-3 py-2" />
           </div>
           <div>
@@ -64,6 +76,7 @@ export function RevenueForm({ serviceId }: { serviceId: string }) {
           <textarea name="note" placeholder="결제 메모..." rows={2}
             className="plane-input w-full px-3 py-2 resize-none" />
         </div>
+        {error && <p className="text-[12px] text-[var(--rose)]">{error}</p>}
         <button type="submit" disabled={loading}
           className="plane-btn-primary w-full py-2">
           {loading ? '추가 중...' : '매출 기록 추가'}

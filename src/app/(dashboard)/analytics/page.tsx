@@ -7,14 +7,16 @@ type ServiceWithRevenue = Service & { revenue_entries: RevenueEntry[] }
 
 export default async function AnalyticsPage() {
   const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return null
 
-  const [servicesResult, allRevenueResult] = await Promise.all([
-    supabase.from('services').select('*, revenue_entries(*)'),
-    supabase.from('revenue_entries').select('*'),
-  ])
+  const { data: servicesData } = await supabase
+    .from('services')
+    .select('*, revenue_entries(*)')
+    .eq('user_id', user.id)
 
-  const services = (servicesResult.data || []) as ServiceWithRevenue[]
-  const revenues = (allRevenueResult.data || []) as RevenueEntry[]
+  const services = (servicesData || []) as ServiceWithRevenue[]
+  const revenues = services.flatMap(s => (s.revenue_entries || [])) as RevenueEntry[]
 
   const serviceRevenue = services.map(s => ({
     name: s.name,
@@ -80,7 +82,7 @@ export default async function AnalyticsPage() {
               .map((item, idx) => {
                 const percentage = Math.round((item.value / maxRevenue) * 100)
                 return (
-                  <div key={idx} className="flex items-center gap-3">
+                  <div key={item.name} className="flex items-center gap-3">
                     <p className="text-[13px] text-[var(--text-primary)] w-40 truncate">{item.name}</p>
                     <div className="flex-1 bg-[var(--surface-3)] rounded-full h-2">
                       <div

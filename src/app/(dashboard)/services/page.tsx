@@ -7,9 +7,12 @@ type ServiceWithRevenue = Service & { revenue_entries: Pick<RevenueEntry, 'amoun
 
 async function getServicesWithRevenue(): Promise<ServiceWithRevenue[]> {
   const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return []
   const { data } = await supabase
     .from('services')
     .select('*, revenue_entries(amount)')
+    .eq('user_id', user.id)
     .order('created_at', { ascending: false })
   return (data || []) as ServiceWithRevenue[]
 }

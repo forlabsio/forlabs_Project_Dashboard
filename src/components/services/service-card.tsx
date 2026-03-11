@@ -58,8 +58,12 @@ export function ServiceCard({ service, totalRevenue = 0 }: ServiceCardProps) {
   async function handleDelete(e: Event) {
     e.preventDefault()
     if (!confirm(`"${service.name}"을(를) 삭제하시겠어요?`)) return
-    await fetch(`/api/services/${service.id}`, { method: 'DELETE' })
-    router.refresh()
+    const res = await fetch(`/api/services/${service.id}`, { method: 'DELETE' })
+    if (res.ok) {
+      router.refresh()
+    } else {
+      alert('삭제에 실패했습니다. 다시 시도해주세요.')
+    }
   }
 
   function handleEdit(e: Event) {

@@ -16,9 +16,17 @@ type RevenueWithService = RevenueEntry & { services: Pick<Service, 'name' | 'id'
 
 export default async function RevenuePage() {
   const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return null
+
+  const { data: userServices } = await supabase
+    .from('services').select('id').eq('user_id', user.id)
+  const serviceIds = (userServices || []).map((s: { id: string }) => s.id)
+
   const { data: revenues } = await supabase
     .from('revenue_entries')
     .select('*, services(name, id)')
+    .in('service_id', serviceIds.length > 0 ? serviceIds : ['none'])
     .order('entry_date', { ascending: false })
     .limit(100)
 

@@ -9,6 +9,7 @@ export function AddServiceDialog() {
   const router = useRouter()
   const [open, setOpen] = useState(false)
   const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
   const [noLaunchDate, setNoLaunchDate] = useState(false)
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -33,8 +34,12 @@ export function AddServiceDialog() {
 
     setLoading(false)
     if (res.ok) {
+      setError(null)
       setOpen(false)
       router.refresh()
+    } else {
+      const json = await res.json().catch(() => ({}))
+      setError(json.error ?? '서비스 추가에 실패했습니다.')
     }
   }
 
@@ -113,6 +118,7 @@ export function AddServiceDialog() {
                 </select>
               </div>
             </div>
+            {error && <p className="text-[12px] text-[var(--rose)]">{error}</p>}
             <button type="submit" disabled={loading}
               className="plane-btn-primary w-full py-2 mt-1">
               {loading ? '추가 중...' : '서비스 추가'}

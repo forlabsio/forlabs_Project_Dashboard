@@ -9,13 +9,18 @@ type ServiceWithRevenue = Service & { revenue_entries: Pick<RevenueEntry, 'amoun
 
 async function getDashboardData() {
   const supabase = await createClient()
-  const [servicesResult, revenueResult] = await Promise.all([
-    supabase.from('services').select('*, revenue_entries(amount)'),
-    supabase.from('revenue_entries').select('*').order('entry_date', { ascending: false }),
-  ])
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { services: [], revenues: [] }
+
+  const { data: services } = await supabase
+    .from('services')
+    .select('*, revenue_entries(*)')
+    .eq('user_id', user.id)
+
+  const revenues = (services || []).flatMap((s: ServiceWithRevenue) => s.revenue_entries || [])
   return {
-    services: (servicesResult.data || []) as ServiceWithRevenue[],
-    revenues: (revenueResult.data || []) as RevenueEntry[],
+    services: (services || []) as ServiceWithRevenue[],
+    revenues: revenues as RevenueEntry[],
   }
 }
 

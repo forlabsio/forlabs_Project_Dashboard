@@ -9,9 +9,15 @@ export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url)
   const serviceId = searchParams.get('service_id')
 
+  // Filter by user's services only
+  const { data: userServices } = await supabase
+    .from('services').select('id').eq('user_id', user.id)
+  const serviceIds = (userServices || []).map((s: { id: string }) => s.id)
+
   let query = supabase
     .from('revenue_entries')
     .select('*, services(name)')
+    .in('service_id', serviceIds.length > 0 ? serviceIds : ['none'])
     .order('entry_date', { ascending: false })
 
   if (serviceId) query = query.eq('service_id', serviceId)
@@ -27,9 +33,20 @@ export async function POST(request: NextRequest) {
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const body = await request.json()
+
+  // Verify service belongs to user
+  const { data: service } = await supabase
+    .from('services').select('id').eq('id', body.service_id).eq('user_id', user.id).single()
+  if (!service) return NextResponse.json({ error: 'Service not found' }, { status: 404 })
+
+  const amount = Number(body.amount)
+  if (isNaN(amount) || amount < 0) {
+    return NextResponse.json({ error: 'Invalid amount' }, { status: 400 })
+  }
+
   const { data, error } = await supabase
     .from('revenue_entries')
-    .insert(body)
+    .insert({ ...body, amount })
     .select()
     .single()
 
