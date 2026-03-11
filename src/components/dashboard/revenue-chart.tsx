@@ -1,7 +1,6 @@
 'use client'
 
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { RevenueEntry } from '@/types'
 
 interface RevenueChartProps {
@@ -28,28 +27,24 @@ export function RevenueChart({ entries }: RevenueChartProps) {
   })
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="text-base">월별 총 매출 (최근 6개월)</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <ResponsiveContainer width="100%" height={200}>
-          <BarChart data={months}>
-            <CartesianGrid strokeDasharray="3 3" vertical={false} />
-            <XAxis dataKey="label" axisLine={false} tickLine={false} tick={{ fontSize: 12 }} />
-            <YAxis
-              tickFormatter={(v: number) => v >= 1000 ? `₩${(v / 1000).toFixed(0)}K` : `₩${v}`}
-              axisLine={false}
-              tickLine={false}
-              tick={{ fontSize: 11 }}
-            />
-            <Tooltip
-              formatter={(value: number | string | undefined) => [`₩${Number(value ?? 0).toLocaleString()}`, '매출']}
-            />
-            <Bar dataKey="total" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
-          </BarChart>
-        </ResponsiveContainer>
-      </CardContent>
-    </Card>
+    <div className="plane-card p-4">
+      <p className="text-[13px] font-semibold text-[var(--text-primary)] mb-4">월별 총 매출 (최근 6개월)</p>
+      <ResponsiveContainer width="100%" height={200}>
+        <BarChart data={months}>
+          <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border-subtle)" />
+          <XAxis dataKey="label" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: 'var(--text-muted)' }} />
+          <YAxis
+            tickFormatter={(v: number) => v >= 1000 ? `₩${(v / 1000).toFixed(0)}K` : `₩${v}`}
+            axisLine={false}
+            tickLine={false}
+            tick={{ fontSize: 11, fill: 'var(--text-muted)' }}
+          />
+          <Tooltip
+            formatter={(value: number | string | undefined) => [`₩${Number(value ?? 0).toLocaleString()}`, '매출']}
+          />
+          <Bar dataKey="total" fill="#16a34a" radius={[4, 4, 0, 0]} />
+        </BarChart>
+      </ResponsiveContainer>
+    </div>
   )
 }

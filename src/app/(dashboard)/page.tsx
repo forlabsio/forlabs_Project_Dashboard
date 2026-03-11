@@ -34,8 +34,8 @@ export default async function DashboardPage() {
   return (
     <div>
       <div className="mb-8">
-        <h1 className="text-2xl font-bold">대시보드</h1>
-        <p className="text-muted-foreground mt-1">
+        <h1 className="text-[20px] font-bold text-[var(--text-primary)]">대시보드</h1>
+        <p className="text-[12px] text-[var(--text-muted)] mt-1">
           {new Date().toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric', timeZone: 'Asia/Seoul' })} 기준
         </p>
       </div>
