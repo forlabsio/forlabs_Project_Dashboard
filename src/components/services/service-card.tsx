@@ -90,7 +90,7 @@ export function ServiceCard({ service, totalRevenue = 0 }: ServiceCardProps) {
                 <DropdownMenuPrimitive.Trigger asChild>
                   <button
                     className="w-6 h-6 flex items-center justify-center rounded-md plane-btn-ghost"
-                    onClick={(e) => e.preventDefault()}
+                    onClick={(e) => { e.preventDefault(); e.stopPropagation() }}
                   >
                     <MoreVertical className="w-3.5 h-3.5" />
                   </button>
@@ -100,6 +100,7 @@ export function ServiceCard({ service, totalRevenue = 0 }: ServiceCardProps) {
                     className="plane-card z-50 p-1 min-w-[120px] shadow-lg"
                     align="end"
                     sideOffset={4}
+                    onClick={(e) => e.stopPropagation()}
                   >
                     <DropdownMenuPrimitive.Item
                       className="flex items-center gap-2 px-2.5 py-1.5 text-[13px] text-[var(--text-secondary)] hover:bg-[var(--surface-3)] hover:text-[var(--text-primary)] rounded-md cursor-pointer outline-none"
