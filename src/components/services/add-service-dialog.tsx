@@ -2,13 +2,8 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Textarea } from '@/components/ui/textarea'
-import { Plus } from 'lucide-react'
+import { Dialog as DialogPrimitive } from 'radix-ui'
+import { Plus, X } from 'lucide-react'
 
 export function AddServiceDialog() {
   const router = useRouter()
@@ -44,90 +39,87 @@ export function AddServiceDialog() {
   }
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button>
-          <Plus className="h-4 w-4 mr-2" />
+    <DialogPrimitive.Root open={open} onOpenChange={setOpen}>
+      <DialogPrimitive.Trigger asChild>
+        <button className="plane-btn-primary flex items-center gap-1.5 px-3 py-2">
+          <Plus className="w-4 h-4" />
           새 서비스 추가
-        </Button>
-      </DialogTrigger>
-      <DialogContent className="max-w-md">
-        <DialogHeader>
-          <DialogTitle>새 서비스 등록</DialogTitle>
-        </DialogHeader>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="name">서비스 이름 *</Label>
-            <Input id="name" name="name" required placeholder="My Awesome Service" />
+        </button>
+      </DialogPrimitive.Trigger>
+      <DialogPrimitive.Portal>
+        <DialogPrimitive.Overlay className="fixed inset-0 bg-black/50 z-50" />
+        <DialogPrimitive.Content className="plane-card-strong fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50 p-6 w-full max-w-md shadow-xl animate-fadein">
+          <div className="flex items-center justify-between mb-5">
+            <DialogPrimitive.Title className="text-[14px] font-semibold text-[var(--text-primary)]">
+              새 서비스 등록
+            </DialogPrimitive.Title>
+            <DialogPrimitive.Close asChild>
+              <button className="plane-btn-ghost w-7 h-7 flex items-center justify-center">
+                <X className="w-4 h-4" />
+              </button>
+            </DialogPrimitive.Close>
           </div>
-          <div className="space-y-2">
-            <Label htmlFor="description">설명</Label>
-            <Textarea id="description" name="description" placeholder="서비스 설명..." rows={3} />
-          </div>
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="category">카테고리</Label>
-              <Input id="category" name="category" placeholder="SaaS, API, 앱..." />
+          <form onSubmit={handleSubmit} className="space-y-3">
+            <div>
+              <label className="block text-[12px] text-[var(--text-secondary)] mb-1">서비스 이름 *</label>
+              <input name="name" required placeholder="My Awesome Service"
+                className="plane-input w-full px-3 py-2" />
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="status">상태</Label>
-              <Select name="status" defaultValue="active">
-                <SelectTrigger id="status">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="active">운영 중</SelectItem>
-                  <SelectItem value="paused">일시정지</SelectItem>
-                  <SelectItem value="test">테스트</SelectItem>
-                  <SelectItem value="killed">종료</SelectItem>
-                </SelectContent>
-              </Select>
+            <div>
+              <label className="block text-[12px] text-[var(--text-secondary)] mb-1">설명</label>
+              <textarea name="description" placeholder="서비스 설명..." rows={3}
+                className="plane-input w-full px-3 py-2 resize-none" />
             </div>
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="url">서비스 URL</Label>
-            <Input id="url" name="url" type="url" placeholder="https://..." />
-          </div>
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <Label htmlFor="launch_date">런칭일</Label>
-                <label className="flex items-center gap-1.5 text-xs text-muted-foreground cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={noLaunchDate}
-                    onChange={(e) => setNoLaunchDate(e.target.checked)}
-                    className="w-3.5 h-3.5"
-                  />
-                  미정
-                </label>
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="block text-[12px] text-[var(--text-secondary)] mb-1">카테고리</label>
+                <input name="category" placeholder="SaaS, API, 앱..."
+                  className="plane-input w-full px-3 py-2" />
               </div>
-              <Input
-                id="launch_date"
-                name="launch_date"
-                type="date"
-                disabled={noLaunchDate}
-                className={noLaunchDate ? 'opacity-40' : ''}
-              />
+              <div>
+                <label className="block text-[12px] text-[var(--text-secondary)] mb-1">상태</label>
+                <select name="status" defaultValue="active" className="plane-input w-full px-3 py-2">
+                  <option value="active">운영 중</option>
+                  <option value="paused">일시정지</option>
+                  <option value="test">테스트</option>
+                  <option value="killed">종료</option>
+                </select>
+              </div>
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="is_paid">유료 여부</Label>
-              <Select name="is_paid" defaultValue="false">
-                <SelectTrigger id="is_paid">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="false">무료</SelectItem>
-                  <SelectItem value="true">유료</SelectItem>
-                </SelectContent>
-              </Select>
+            <div>
+              <label className="block text-[12px] text-[var(--text-secondary)] mb-1">서비스 URL</label>
+              <input name="url" type="url" placeholder="https://..."
+                className="plane-input w-full px-3 py-2" />
             </div>
-          </div>
-          <Button type="submit" className="w-full" disabled={loading}>
-            {loading ? '추가 중...' : '서비스 추가'}
-          </Button>
-        </form>
-      </DialogContent>
-    </Dialog>
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <div className="flex items-center justify-between mb-1">
+                  <label className="text-[12px] text-[var(--text-secondary)]">런칭일</label>
+                  <label className="flex items-center gap-1 text-[11px] text-[var(--text-muted)] cursor-pointer">
+                    <input type="checkbox" checked={noLaunchDate}
+                      onChange={(e) => setNoLaunchDate(e.target.checked)}
+                      className="w-3 h-3" />
+                    미정
+                  </label>
+                </div>
+                <input name="launch_date" type="date" disabled={noLaunchDate}
+                  className="plane-input w-full px-3 py-2" />
+              </div>
+              <div>
+                <label className="block text-[12px] text-[var(--text-secondary)] mb-1">유료 여부</label>
+                <select name="is_paid" defaultValue="false" className="plane-input w-full px-3 py-2">
+                  <option value="false">무료</option>
+                  <option value="true">유료</option>
+                </select>
+              </div>
+            </div>
+            <button type="submit" disabled={loading}
+              className="plane-btn-primary w-full py-2 mt-1">
+              {loading ? '추가 중...' : '서비스 추가'}
+            </button>
+          </form>
+        </DialogPrimitive.Content>
+      </DialogPrimitive.Portal>
+    </DialogPrimitive.Root>
   )
 }
