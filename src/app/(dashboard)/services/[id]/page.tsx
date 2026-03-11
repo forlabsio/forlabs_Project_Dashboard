@@ -2,18 +2,15 @@ import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import { RevenueForm } from '@/components/services/revenue-form'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
 import { ArrowLeft, ExternalLink } from 'lucide-react'
-import { RevenueEntry, Service } from '@/types'
+import { RevenueEntry } from '@/types'
 
 const statusLabels: Record<string, string> = { active: '운영 중', paused: '일시정지', killed: '종료', test: '테스트' }
 const statusColors: Record<string, string> = {
-  active: 'bg-green-100 text-green-800',
-  paused: 'bg-yellow-100 text-yellow-800',
-  killed: 'bg-red-100 text-red-800',
-  test: 'bg-blue-100 text-blue-800',
+  active: 'bg-green-500/15 text-green-700 dark:text-green-400',
+  paused: 'bg-gray-500/15 text-gray-600 dark:text-gray-400',
+  killed: 'bg-red-500/15 text-red-700 dark:text-red-400',
+  test: 'bg-blue-500/15 text-blue-700 dark:text-blue-400',
 }
 const revenueTypeLabels: Record<string, string> = {
   'one-time': '일회성', subscription: '구독', ads: '광고', other: '기타'
@@ -45,85 +42,74 @@ export default async function ServiceDetailPage({
   return (
     <div>
       <div className="mb-6">
-        <Link href="/services" className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground mb-4">
+        <Link href="/services" className="flex items-center gap-2 text-[12px] text-[var(--text-muted)] hover:text-[var(--text-primary)] mb-4 transition-colors">
           <ArrowLeft className="h-4 w-4" />
           서비스 목록
         </Link>
         <div className="flex items-start justify-between">
           <div>
             <div className="flex items-center gap-3">
-              <h1 className="text-2xl font-bold">{service.name}</h1>
-              <span className={`text-xs px-2 py-1 rounded-full font-medium ${statusColors[service.status] ?? ''}`}>
+              <h1 className="text-[20px] font-bold text-[var(--text-primary)]">{service.name}</h1>
+              <span className={`plane-badge ${statusColors[service.status] ?? ''}`}>
                 {statusLabels[service.status] ?? service.status}
               </span>
             </div>
             {service.description && (
-              <p className="text-muted-foreground mt-1">{service.description}</p>
+              <p className="text-[13px] text-[var(--text-muted)] mt-1">{service.description}</p>
             )}
           </div>
           {service.url && (
-            <Button variant="outline" size="sm" asChild>
-              <a href={service.url} target="_blank" rel="noopener noreferrer">
-                <ExternalLink className="h-4 w-4 mr-2" />
-                방문하기
-              </a>
-            </Button>
+            <a href={service.url} target="_blank" rel="noopener noreferrer"
+              className="plane-btn-outline flex items-center gap-2 px-3 py-2">
+              <ExternalLink className="h-4 w-4" />
+              방문하기
+            </a>
           )}
         </div>
       </div>
 
       <div className="grid grid-cols-3 gap-4 mb-6">
-        <Card>
-          <CardContent className="pt-6">
-            <p className="text-2xl font-bold">₩{totalRevenue.toLocaleString()}</p>
-            <p className="text-sm text-muted-foreground">총 매출</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="pt-6">
-            <p className="text-2xl font-bold">₩{monthlyRevenue.toLocaleString()}</p>
-            <p className="text-sm text-muted-foreground">최근 30일 매출</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="pt-6">
-            <p className="text-2xl font-bold">{revenues.length}건</p>
-            <p className="text-sm text-muted-foreground">총 거래 수</p>
-          </CardContent>
-        </Card>
+        <div className="plane-card-inner p-4">
+          <p className="text-[22px] font-bold text-[var(--text-primary)]">₩{totalRevenue.toLocaleString()}</p>
+          <p className="text-[12px] text-[var(--text-muted)] mt-0.5">총 매출</p>
+        </div>
+        <div className="plane-card-inner p-4">
+          <p className="text-[22px] font-bold text-[var(--text-primary)]">₩{monthlyRevenue.toLocaleString()}</p>
+          <p className="text-[12px] text-[var(--text-muted)] mt-0.5">최근 30일 매출</p>
+        </div>
+        <div className="plane-card-inner p-4">
+          <p className="text-[22px] font-bold text-[var(--text-primary)]">{revenues.length}건</p>
+          <p className="text-[12px] text-[var(--text-muted)] mt-0.5">총 거래 수</p>
+        </div>
       </div>
 
       <div className="grid grid-cols-3 gap-6">
         <div className="col-span-2">
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-base">매출 기록</CardTitle>
-            </CardHeader>
-            <CardContent>
-              {revenues.length === 0 ? (
-                <p className="text-center text-muted-foreground py-8">아직 매출 기록이 없습니다</p>
-              ) : (
-                <div className="space-y-2">
-                  {revenues
-                    .sort((a, b) => new Date(b.entry_date).getTime() - new Date(a.entry_date).getTime())
-                    .map((entry) => (
-                      <div key={entry.id} className="flex items-center justify-between py-2 border-b last:border-0">
-                        <div>
-                          <p className="text-sm font-medium">₩{Number(entry.amount).toLocaleString()}</p>
-                          <p className="text-xs text-muted-foreground">
-                            {new Date(entry.entry_date).toLocaleDateString('ko-KR')} · {revenueTypeLabels[entry.revenue_type] ?? entry.revenue_type}
-                          </p>
-                          {entry.note && <p className="text-xs text-muted-foreground">{entry.note}</p>}
-                        </div>
-                        <Badge variant="outline" className="text-xs">
-                          {revenueTypeLabels[entry.revenue_type] ?? entry.revenue_type}
-                        </Badge>
+          <div className="plane-card p-4">
+            <p className="text-[13px] font-semibold text-[var(--text-primary)] mb-3">매출 기록</p>
+            {revenues.length === 0 ? (
+              <p className="text-center text-[var(--text-muted)] py-8 text-[13px]">아직 매출 기록이 없습니다</p>
+            ) : (
+              <div className="space-y-1">
+                {revenues
+                  .sort((a, b) => new Date(b.entry_date).getTime() - new Date(a.entry_date).getTime())
+                  .map((entry) => (
+                    <div key={entry.id} className="flex items-center justify-between py-2 border-b border-[var(--border-subtle)] last:border-0">
+                      <div>
+                        <p className="text-[13px] font-medium text-[var(--text-primary)]">₩{Number(entry.amount).toLocaleString()}</p>
+                        <p className="text-[11px] text-[var(--text-muted)]">
+                          {new Date(entry.entry_date).toLocaleDateString('ko-KR')} · {revenueTypeLabels[entry.revenue_type] ?? entry.revenue_type}
+                        </p>
+                        {entry.note && <p className="text-[11px] text-[var(--text-muted)]">{entry.note}</p>}
                       </div>
-                    ))}
-                </div>
-              )}
-            </CardContent>
-          </Card>
+                      <span className="plane-badge bg-[var(--surface-3)] text-[var(--text-muted)]">
+                        {revenueTypeLabels[entry.revenue_type] ?? entry.revenue_type}
+                      </span>
+                    </div>
+                  ))}
+              </div>
+            )}
+          </div>
         </div>
         <div>
           <RevenueForm serviceId={id} />
