@@ -50,8 +50,8 @@ export default async function AnalyticsPage() {
         {[
           { count: statusCounts.active, label: '운영 중', color: 'text-[var(--accent)]' },
           { count: statusCounts.paused, label: '일시정지', color: 'text-[var(--text-muted)]' },
-          { count: statusCounts.test, label: '테스트', color: 'text-blue-500' },
-          { count: statusCounts.killed, label: '종료', color: 'text-red-500' },
+          { count: statusCounts.test, label: '테스트', color: 'text-[var(--sky)]' },
+          { count: statusCounts.killed, label: '종료', color: 'text-[var(--rose)]' },
         ].map(({ count, label, color }) => (
           <div key={label} className="plane-card p-4">
             <p className={`text-[22px] font-bold ${color}`}>{count}</p>

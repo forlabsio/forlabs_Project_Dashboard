@@ -52,20 +52,20 @@ export default async function DashboardPage() {
           value={`₩${totalRevenue.toLocaleString()}`}
           subtitle={`거래 ${revenues.length}건`}
           icon={DollarSign}
-          iconColor="text-green-600"
+          iconColor="text-[var(--accent)]"
         />
         <StatsCard
           title="최근 30일 매출"
           value={`₩${monthlyRevenue.toLocaleString()}`}
           icon={TrendingUp}
-          iconColor="text-blue-600"
+          iconColor="text-[var(--sky)]"
         />
         <StatsCard
           title="유료 서비스"
           value={`${paidServices}개`}
           subtitle={`전체의 ${services.length > 0 ? Math.round(paidServices / services.length * 100) : 0}%`}
           icon={Activity}
-          iconColor="text-purple-600"
+          iconColor="text-[var(--amber)]"
         />
       </div>
 

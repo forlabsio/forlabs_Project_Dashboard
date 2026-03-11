@@ -4,10 +4,10 @@ import { Service, RevenueEntry } from '@/types'
 type ServiceWithRevenue = Service & { revenue_entries: Pick<RevenueEntry, 'amount'>[] }
 
 const statusColors: Record<string, string> = {
-  active: 'bg-green-500/15 text-green-700 dark:text-green-400',
-  paused: 'bg-gray-500/15 text-gray-600 dark:text-gray-400',
-  killed: 'bg-red-500/15 text-red-700 dark:text-red-400',
-  test: 'bg-blue-500/15 text-blue-700 dark:text-blue-400',
+  active: 'badge-active',
+  paused: 'badge-paused',
+  killed: 'badge-killed',
+  test:   'badge-test',
 }
 const statusLabels: Record<string, string> = { active: '운영 중', paused: '일시정지', killed: '종료', test: '테스트' }
 

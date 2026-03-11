@@ -42,7 +42,7 @@ export function RevenueChart({ entries }: RevenueChartProps) {
           <Tooltip
             formatter={(value: number | string | undefined) => [`₩${Number(value ?? 0).toLocaleString()}`, '매출']}
           />
-          <Bar dataKey="total" fill="#16a34a" radius={[4, 4, 0, 0]} />
+          <Bar dataKey="total" fill="#0a9a5c" radius={[4, 4, 0, 0]} />
         </BarChart>
       </ResponsiveContainer>
     </div>

@@ -6,10 +6,10 @@ const revenueTypeLabels: Record<string, string> = {
   'one-time': '일회성', subscription: '구독', ads: '광고', other: '기타'
 }
 const revenueTypeBadge: Record<string, string> = {
-  'one-time': 'bg-blue-500/15 text-blue-700 dark:text-blue-400',
-  subscription: 'bg-green-500/15 text-green-700 dark:text-green-400',
-  ads: 'bg-purple-500/15 text-purple-700 dark:text-purple-400',
-  other: 'bg-gray-500/15 text-gray-600 dark:text-gray-400',
+  'one-time':   'badge-onetime',
+  subscription: 'badge-subscription',
+  ads:          'badge-ads',
+  other:        'badge-other',
 }
 
 type RevenueWithService = RevenueEntry & { services: Pick<Service, 'name' | 'id'> | null }
